@@ -4,9 +4,17 @@
 
 package frc.robot;
 
+import frc.robot.Constants.JoystickConstants;
 import frc.robot.Constants.OperatorConstants;
-import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.*;
+import frc.robot.commands.Flywheel.ManualFlywheelCommand;
+import frc.robot.commands.HorizontalConveyor.ManualIntakeCommand;
+import frc.robot.commands.HorizontalConveyor.ToggleIntakeCommand;
+import frc.robot.commands.VerticalConveyor.ManualConveyorCommand;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -18,9 +26,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  private final GenericHID primaryGenericHID = new GenericHID(OperatorConstants.kDriverControllerPort);
+
+  private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
+  private final HorizontalConveyorSubsystem horizontalConveyorSubsystem = new HorizontalConveyorSubsystem();
+  private final VerticalConveyorSubsystem verticalConveyorSubsystem = new VerticalConveyorSubsystem();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -38,19 +48,43 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    new JoystickButton(primaryGenericHID, JoystickConstants.kBButtonPort)
+    .onTrue(
+      new ToggleIntakeCommand(horizontalConveyorSubsystem)
+    );
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
+    new JoystickButton(primaryGenericHID, JoystickConstants.kLeftBumperPort)
+    .onTrue(
+      new ParallelCommandGroup(
+        new ManualIntakeCommand(primaryGenericHID, horizontalConveyorSubsystem),
+        new ManualConveyorCommand(primaryGenericHID, verticalConveyorSubsystem)
+      )
+    );
+
+    new JoystickButton(primaryGenericHID, JoystickConstants.kRightBumperPort)
+    .onTrue(
+      new ParallelCommandGroup(
+        new ManualIntakeCommand(primaryGenericHID, horizontalConveyorSubsystem),
+        new ManualConveyorCommand(primaryGenericHID, verticalConveyorSubsystem)
+      )
+    );
+
+    new Trigger(() -> Math.abs(primaryGenericHID.getRawAxis(JoystickConstants.kLeftYJoystickPort)) >= JoystickConstants.kDeadzone)
+      .onTrue(
+        new ManualFlywheelCommand(primaryGenericHID, flywheelSubsystem)
+    );
   }
 
+  
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
+  /* 
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    return ;
   }
+  */
 }
