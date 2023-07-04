@@ -10,9 +10,9 @@ import frc.robot.subsystems.*;
 import frc.robot.commands.Flywheel.ManualFlywheelCommand;
 import frc.robot.commands.HorizontalConveyor.ManualIntakeCommand;
 import frc.robot.commands.HorizontalConveyor.ToggleIntakeCommand;
-import frc.robot.commands.VerticalConveyor.ManualConveyorCommand;
+import frc.robot.commands.VerticalConveyor.ManualVConveyorCommand;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -55,18 +55,22 @@ public class RobotContainer {
 
     new JoystickButton(primaryGenericHID, JoystickConstants.kLeftBumperPort)
     .onTrue(
-      new ParallelCommandGroup(
-        new ManualIntakeCommand(primaryGenericHID, horizontalConveyorSubsystem),
-        new ManualConveyorCommand(primaryGenericHID, verticalConveyorSubsystem)
-      )
+      new ManualVConveyorCommand(primaryGenericHID, verticalConveyorSubsystem)
     );
 
+    new Trigger(() -> Math.abs(primaryGenericHID.getRawAxis(JoystickConstants.kLeftTriggerPort)) >= JoystickConstants.kDeadzone)
+    .onTrue(
+        new ManualVConveyorCommand(primaryGenericHID, verticalConveyorSubsystem)
+    );
+    
     new JoystickButton(primaryGenericHID, JoystickConstants.kRightBumperPort)
     .onTrue(
-      new ParallelCommandGroup(
-        new ManualIntakeCommand(primaryGenericHID, horizontalConveyorSubsystem),
-        new ManualConveyorCommand(primaryGenericHID, verticalConveyorSubsystem)
-      )
+      new ManualIntakeCommand(primaryGenericHID, horizontalConveyorSubsystem)
+    );
+
+    new Trigger(() -> Math.abs(primaryGenericHID.getRawAxis(JoystickConstants.kRightTriggerPort)) >= JoystickConstants.kDeadzone)
+    .onTrue(
+      new ManualIntakeCommand(primaryGenericHID, horizontalConveyorSubsystem)
     );
 
     new Trigger(() -> Math.abs(primaryGenericHID.getRawAxis(JoystickConstants.kLeftYJoystickPort)) >= JoystickConstants.kDeadzone)

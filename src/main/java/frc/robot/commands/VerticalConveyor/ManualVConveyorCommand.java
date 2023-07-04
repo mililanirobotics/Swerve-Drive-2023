@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 //general imports
 import frc.robot.Constants.JoystickConstants;
 
-public class ManualConveyorCommand extends CommandBase {
+public class ManualVConveyorCommand extends CommandBase {
     //declaring subsystems
     private VerticalConveyorSubsystem m_VerticalConveyorSubsystem;
 
@@ -15,7 +15,7 @@ public class ManualConveyorCommand extends CommandBase {
     private GenericHID joystick;
 
     //constructor
-    public ManualConveyorCommand(GenericHID joystick, VerticalConveyorSubsystem verticalConveyorSubsystem) {
+    public ManualVConveyorCommand(GenericHID joystick, VerticalConveyorSubsystem verticalConveyorSubsystem) {
         this.joystick = joystick;
         m_VerticalConveyorSubsystem = verticalConveyorSubsystem;
 
@@ -29,18 +29,18 @@ public class ManualConveyorCommand extends CommandBase {
     
     @Override
     public void execute() {
-        int speed = joystick.getRawButton(JoystickConstants.kLeftBumperPort) ? 1 : joystick.getRawButton(JoystickConstants.kRightBumperPort) ? -1 : 0;
+        int speed = joystick.getRawButton(JoystickConstants.kLeftBumperPort) ? 1 :  (joystick.getRawAxis(JoystickConstants.kLeftTriggerPort) > 0.1) ? -1 : 0;
         m_VerticalConveyorSubsystem.setVerticalIntakeSpeed(speed);
     }
 
     @Override
     public void end(boolean interrupted) {
-        
+        m_VerticalConveyorSubsystem.setVerticalIntakeSpeed(0);
     }
 
     //in progress
     @Override
     public boolean isFinished() {
-        return joystick.getRawButton(JoystickConstants.kLeftBumperPort) == false;
+        return joystick.getRawButton(JoystickConstants.kLeftBumperPort) && (joystick.getRawAxis(JoystickConstants.kLeftTriggerPort) <= JoystickConstants.kDeadzone) == false;
     }
 }

@@ -35,12 +35,12 @@ public class ManualFlywheelCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        
+        m_FlywheelSubsystem.setFlywheelSpeed(0);
     }
 
     //in progress
     @Override
     public boolean isFinished() {
-        return Math.abs(joystick.getRawAxis(JoystickConstants.kLeftYJoystickPort)) < 0.2;
+        return Math.abs(joystick.getRawAxis(JoystickConstants.kLeftYJoystickPort)) < 0.1;
     }
 }

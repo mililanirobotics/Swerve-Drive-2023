@@ -13,9 +13,9 @@ import frc.robot.Constants.HorizontalConveyorConstants;
 
 public class HorizontalConveyorSubsystem extends SubsystemBase{
     private CANSparkMax horizontalConveyor;
-    private CANSparkMax horizontalRoller;
+    private CANSparkMax horizontalIntake;
 
-    private MotorControllerGroup horizontalIntake;
+    private MotorControllerGroup horizontalGroup;
 
     private DoubleSolenoid leftSolenoid;
     private DoubleSolenoid rightSolenoid;
@@ -24,12 +24,12 @@ public class HorizontalConveyorSubsystem extends SubsystemBase{
 
     public HorizontalConveyorSubsystem() {
         horizontalConveyor = new CANSparkMax(HorizontalConveyorConstants.kHorizontalConveyor, MotorType.kBrushless);
-        horizontalRoller = new CANSparkMax(0, MotorType.kBrushless);
+        horizontalIntake = new CANSparkMax(HorizontalConveyorConstants.kHorizontalIntake, MotorType.kBrushless);
 
         horizontalConveyor.setInverted(HorizontalConveyorConstants.kHorizontalConveyorReverse);
-        horizontalRoller.setInverted(HorizontalConveyorConstants.kHorizontalRollerReverse);
+        horizontalIntake.setInverted(HorizontalConveyorConstants.kHorizontalIntakeReverse);
 
-        horizontalIntake = new MotorControllerGroup(horizontalConveyor, horizontalRoller);
+        horizontalGroup = new MotorControllerGroup(horizontalConveyor, horizontalIntake);
 
         leftSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, HorizontalConveyorConstants.kLeftSolenoidForwardChannel, 
             HorizontalConveyorConstants.kLeftSolenoidReverseChannel);
@@ -62,8 +62,9 @@ public class HorizontalConveyorSubsystem extends SubsystemBase{
         return horizontalSwitch.get();
     }
 
-    public void setHorizontalIntakeSpeed(double percentPower) {
+    public void setIntakeSpeed(double percentPower) {
         horizontalIntake.setVoltage(percentPower * 12);
+        horizontalConveyor.setVoltage(percentPower * 12);
     }
 }
 

@@ -27,10 +27,10 @@ public final class Constants {
 
   public final static class HorizontalConveyorConstants {
     public final static int kHorizontalConveyor = 18;
-    public final static int kHorizontalRoller = 30;
+    public final static int kHorizontalIntake = 30;
 
-    public final static boolean kHorizontalConveyorReverse = false;
-    public final static boolean kHorizontalRollerReverse = false;
+    public final static boolean kHorizontalConveyorReverse = true;
+    public final static boolean kHorizontalIntakeReverse = false;
 
     public final static int kLeftSolenoidForwardChannel = 0;
     public final static int kLeftSolenoidReverseChannel = 1;
@@ -43,7 +43,7 @@ public final class Constants {
     public final static int kLeftVerticalConveyor = 20;
     public final static int kRightVerticalConveyor = 19;
 
-    public final static boolean kLeftVerticalConveyorReverse = false;
+    public final static boolean kLeftVerticalConveyorReverse = true;
     public final static boolean kRightVerticalConveyorReverse = false;
   }
 

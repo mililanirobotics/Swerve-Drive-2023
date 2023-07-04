@@ -29,18 +29,18 @@ public class ManualIntakeCommand extends CommandBase {
     
     @Override
     public void execute() { 
-        int speed = joystick.getRawButton(JoystickConstants.kLeftBumperPort) ? 1 : joystick.getRawButton(JoystickConstants.kRightBumperPort) ? -1 : 0;
-        m_HorizontalConveyorSubsystem.setHorizontalIntakeSpeed(speed);
+        int speed = joystick.getRawButton(JoystickConstants.kRightBumperPort) ? 1 : (joystick.getRawAxis(JoystickConstants.kRightTriggerPort) > 0.1) ? -1 : 0;
+        m_HorizontalConveyorSubsystem.setIntakeSpeed(speed);
     }
 
     @Override
     public void end(boolean interrupted) {
-        
+        m_HorizontalConveyorSubsystem.setIntakeSpeed(0);
     }
 
     //in progress
     @Override
     public boolean isFinished() {
-        return joystick.getRawButton(JoystickConstants.kLeftBumperPort) && joystick.getRawButton(JoystickConstants.kRightBumperPort) == false;
+        return joystick.getRawButton(JoystickConstants.kRightBumperPort) && (joystick.getRawAxis(JoystickConstants.kLeftTriggerPort) <= JoystickConstants.kDeadzone) == false;
     }
 }
