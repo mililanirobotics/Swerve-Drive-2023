@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -13,7 +16,7 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static class OperatorConstants {
+  public static class SwerveModuleConstants {
 
     public static final int kDriverControllerPort = 0;
 
@@ -34,7 +37,7 @@ public final class Constants {
     public static final int kRightBackRotationPort = 8;
     public static final int kRightBackAbsoluteEncoderPort = 3;
 
-    public static final int kAbsoluteEncoderOffset = .20;
+    public static final double kAbsoluteEncoderOffset = .20;
     
 
     // Reverse Booleans
@@ -42,5 +45,89 @@ public final class Constants {
     public static final boolean kRightFrontReversed = true;
     public static final boolean kLeftBackReversed = false;
     public static final boolean kRightBackReversed = true;
+
+    // Conversion Units
+    public static final double kRotationToMeters = 0;
+    public static final double kRotationToRadians = 0;
+
+    // Measurement Units
+    public static final double kMetersPerSecond = 0;
+    public static final double kRadiansPerSecond = 0;
+
+    // PID Constants
+
+    public static final double kTurningP = 0;
+    public static final double kTurningI = 0;
+    public static final double kTurningD = 0;
+
+    // The distances between each Module from the center of the robot (Meters)
+    public static final double kModuleDistance = 0.312;
+
+    // 2d translation coordinates relative to center 
+
+    public static final double kLeftFront2dX = kModuleDistance;
+    public static final double kLeftFront2dY = kModuleDistance;
+
+    public static final double kRightFront2dX = kModuleDistance;
+    public static final double kRightFront2dY = -kModuleDistance;
+
+    public static final double kLeftBack2dX = -kModuleDistance;
+    public static final double kLeftBack2dY = kModuleDistance;
+
+    public static final double kRightBack2dX = -kModuleDistance;
+    public static final double kRightBack2dY = -kModuleDistance;
+
+    public static final Translation2d leftFrontLocation = new Translation2d(
+      SwerveModuleConstants.kLeftFront2dX, 
+      SwerveModuleConstants.kLeftFront2dY
+    );
+
+    public static final Translation2d rightFrontLocation = new Translation2d(
+      SwerveModuleConstants.kRightFront2dX,
+      SwerveModuleConstants.kRightFront2dY
+    );
+
+    public static final Translation2d leftBackLocation = new Translation2d(
+      SwerveModuleConstants.kLeftBack2dX,
+      SwerveModuleConstants.kLeftBack2dY
+    );
+
+    public static final Translation2d rightBackLocation = new Translation2d(
+      SwerveModuleConstants.kRightBack2dX,
+      SwerveModuleConstants.kRightBack2dY
+    );
+
+    public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
+      leftFrontLocation, rightFrontLocation, leftBackLocation, rightBackLocation
+    );
   }
+
+  public static class DriveConstants {
+
+    // Drive Speed Constants
+    public static final double kDriveMaxMetersPerSecond = 1;
+    public static final double kRotationMaxRadiansPerSecond = 1.5;
+
+    public static final double kTeleDriveMaxMetersPerSecond = kDriveMaxMetersPerSecond / 4;
+    public static final double kTeleRotationMaxRadiansPerSecond = kRotationMaxRadiansPerSecond / 4;
+
+  }
+
+  public static class JoystickConstants {
+    public static final int kPrimaryGamepadPort = 0;
+
+    // Gamepad Axis Ports
+    public static final int kleftXJoystickPort = 0;
+    public static final int kLeftYJoystickPort = 1;
+    public static final int kRightXJoystickPort = 2;
+    public static final int kRightYJoystickPort = 3; 
+
+    // Gamepad Button Ports
+    public final static int kAButtonPort = 1;
+    public final static int kBButtonPort = 2;
+    
+    // Deadband constant to correct minor joystick inputs
+    public static final double kDeadband = 0.05;
+  }
+
 }
