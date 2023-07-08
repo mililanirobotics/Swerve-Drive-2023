@@ -14,6 +14,33 @@ package frc.robot;
  */
 public final class Constants {
   public static class OperatorConstants {
+
     public static final int kDriverControllerPort = 0;
+
+    // Drive Port Constants
+    public static final int kLeftFrontWheelPort = 1;
+    public static final int kLeftFrontRotationPort = 2;
+    public static final int kLeftFrontAbsoluteEncoderPort = 0;
+
+    public static final int kRightFrontWheelPort = 3;
+    public static final int kRightFrontRotationPort = 4;
+    public static final int kRightFrontAbsoluteEncoderPort = 1;
+
+    public static final int kLeftBackWheelPort = 5;
+    public static final int kLeftBackRotationPort = 6;
+    public static final int kLeftBackAbsoluteEncoderPort = 2;
+
+    public static final int kRightBackWheelPort = 7;
+    public static final int kRightBackRotationPort = 8;
+    public static final int kRightBackAbsoluteEncoderPort = 3;
+
+    public static final int kAbsoluteEncoderOffset = .20;
+    
+
+    // Reverse Booleans
+    public static final boolean kLeftFrontReversed = false;
+    public static final boolean kRightFrontReversed = true;
+    public static final boolean kLeftBackReversed = false;
+    public static final boolean kRightBackReversed = true;
   }
 }
