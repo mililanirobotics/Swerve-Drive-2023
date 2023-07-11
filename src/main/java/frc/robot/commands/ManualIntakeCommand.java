@@ -1,4 +1,4 @@
-package frc.robot.commands.HorizontalConveyor;
+package frc.robot.commands;
 
 //subsystems and commands
 import frc.robot.subsystems.HorizontalConveyorSubsystem;
@@ -21,15 +21,10 @@ public class ManualIntakeCommand extends CommandBase {
 
         addRequirements(m_HorizontalConveyorSubsystem);
     }
-
-    @Override
-    public void initialize() {
-
-    }
     
     @Override
     public void execute() { 
-        int speed = joystick.getRawButton(JoystickConstants.kRightBumperPort) ? 1 : (joystick.getRawAxis(JoystickConstants.kRightTriggerPort) > 0.1) ? -1 : 0;
+        int speed = joystick.getRawButton(JoystickConstants.kRightBumperPort) ? 1 : (joystick.getRawAxis(JoystickConstants.kRightTriggerPort) > JoystickConstants.kDeadzone) ? -1 : 0;
         m_HorizontalConveyorSubsystem.setIntakeSpeed(speed);
     }
 
@@ -41,6 +36,6 @@ public class ManualIntakeCommand extends CommandBase {
     //in progress
     @Override
     public boolean isFinished() {
-        return joystick.getRawButton(JoystickConstants.kRightBumperPort) && (joystick.getRawAxis(JoystickConstants.kLeftTriggerPort) <= JoystickConstants.kDeadzone) == false;
+        return joystick.getRawButton(JoystickConstants.kRightBumperPort) && (joystick.getRawAxis(JoystickConstants.kLeftTriggerPort) < JoystickConstants.kDeadzone) == false;
     }
 }

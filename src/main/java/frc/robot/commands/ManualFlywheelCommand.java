@@ -1,4 +1,4 @@
-package frc.robot.commands.Flywheel;
+package frc.robot.commands;
 
 //subsystems and commands
 import frc.robot.subsystems.FlywheelSubsystem;
@@ -21,11 +21,6 @@ public class ManualFlywheelCommand extends CommandBase {
 
         addRequirements(m_FlywheelSubsystem);
     }
-
-    @Override
-    public void initialize() {
-   
-    }
     
     @Override
     public void execute() {
@@ -41,6 +36,6 @@ public class ManualFlywheelCommand extends CommandBase {
     //in progress
     @Override
     public boolean isFinished() {
-        return Math.abs(joystick.getRawAxis(JoystickConstants.kLeftYJoystickPort)) < 0.1;
+        return Math.abs(joystick.getRawAxis(JoystickConstants.kLeftYJoystickPort)) < JoystickConstants.kDeadzone;
     }
 }

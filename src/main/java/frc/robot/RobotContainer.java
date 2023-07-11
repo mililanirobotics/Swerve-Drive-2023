@@ -7,12 +7,10 @@ package frc.robot;
 import frc.robot.Constants.JoystickConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.*;
-import frc.robot.commands.Flywheel.ManualFlywheelCommand;
-import frc.robot.commands.HorizontalConveyor.ManualIntakeCommand;
-import frc.robot.commands.HorizontalConveyor.ToggleIntakeCommand;
-import frc.robot.commands.VerticalConveyor.ManualVConveyorCommand;
+import frc.robot.commands.ManualFlywheelCommand;
+import frc.robot.commands.ManualIntakeCommand;
+import frc.robot.commands.ManualVConveyorCommand;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -48,10 +46,6 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    new JoystickButton(primaryGenericHID, JoystickConstants.kBButtonPort)
-    .onTrue(
-      new ToggleIntakeCommand(horizontalConveyorSubsystem)
-    );
 
     new JoystickButton(primaryGenericHID, JoystickConstants.kLeftBumperPort)
     .onTrue(

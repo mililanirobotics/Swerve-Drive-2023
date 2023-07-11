@@ -1,4 +1,4 @@
-package frc.robot.commands.VerticalConveyor;
+package frc.robot.commands;
 
 //subsystems and commands
 import frc.robot.subsystems.VerticalConveyorSubsystem;
@@ -21,15 +21,10 @@ public class ManualVConveyorCommand extends CommandBase {
 
         addRequirements(m_VerticalConveyorSubsystem);
     }
-
-    @Override
-    public void initialize() {
-   
-    }
     
     @Override
     public void execute() {
-        int speed = joystick.getRawButton(JoystickConstants.kLeftBumperPort) ? 1 :  (joystick.getRawAxis(JoystickConstants.kLeftTriggerPort) > 0.1) ? -1 : 0;
+        int speed = joystick.getRawButton(JoystickConstants.kLeftBumperPort) ? 1 :  (joystick.getRawAxis(JoystickConstants.kLeftTriggerPort) > JoystickConstants.kDeadzone) ? -1 : 0;
         m_VerticalConveyorSubsystem.setVerticalIntakeSpeed(speed);
     }
 
@@ -41,6 +36,6 @@ public class ManualVConveyorCommand extends CommandBase {
     //in progress
     @Override
     public boolean isFinished() {
-        return joystick.getRawButton(JoystickConstants.kLeftBumperPort) && (joystick.getRawAxis(JoystickConstants.kLeftTriggerPort) <= JoystickConstants.kDeadzone) == false;
+        return joystick.getRawButton(JoystickConstants.kLeftBumperPort) && (joystick.getRawAxis(JoystickConstants.kLeftTriggerPort) < JoystickConstants.kDeadzone) == false;
     }
 }
