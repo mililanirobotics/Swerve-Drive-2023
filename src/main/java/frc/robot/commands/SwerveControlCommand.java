@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 
 import frc.robot.subsystems.SwerveDriveSubsystem;
+import frc.robot.subsystems.SwerveModule;
 import frc.robot.Constants.JoystickConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.Constants.DriveConstants;
@@ -20,7 +21,7 @@ public class SwerveControlCommand extends CommandBase{
     private SwerveDriveSubsystem swerveDriveSubsystem;
 
     // SlewRateLimiter limits the rate of acceleration to be gradual and linear
-    private SlewRateLimiter xLimiter, yLimiter, turningLimiter;
+    //private SlewRateLimiter xLimiter, yLimiter, turningLimiter;
     
     private Supplier<Double> xSpeedInput, ySpeedInput, turningSpeedInput;
     private Supplier<Boolean> fieldOrientedFunction;
@@ -62,20 +63,25 @@ public class SwerveControlCommand extends CommandBase{
 
         // Limiting Drive Speeds Acceleration to be linear
 
-        xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxMetersPerSecond;
-        ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxMetersPerSecond;
-        turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kTeleRotationMaxRadiansPerSecond;
+        // xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxMetersPerSecond;
+        // ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxMetersPerSecond;
+        // turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kTeleRotationMaxRadiansPerSecond;
 
         // Creating desired chassis speeds from joystick inputs.
-        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed, ySpeed, turningSpeed, swerveDriveSubsystem.getRotation2d()
-        );
+        // chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        //     xSpeed, ySpeed, turningSpeed, swerveDriveSubsystem.getRotation2d()
+        // );
+
+        chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
 
         // Convert chassis speeds into swerve module states
         SwerveModuleState[] moduleStates = SwerveModuleConstants.kinematics.toSwerveModuleStates(chassisSpeeds);
         
         // Output each module state to the wheels
         swerveDriveSubsystem.setModuleStates(moduleStates);
+
+        // Temporary CANCoder print
+        // System.out.println(leftFrontModule.getAbsoluteEncoderReading);
     }
     
     // Called once the command ends or is interrupted.

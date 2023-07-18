@@ -3,6 +3,10 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.AnalogInput; 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxRelativeEncoder;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
+import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -22,7 +26,7 @@ public class SwerveModule {
     //PID controller
     private final PIDController rotationPID;
     //angle offsets
-    private final AnalogInput absoluteEncoder;
+    private final CANCoder angleCANCoder;
     private final boolean absoluteEncoderReversed;
     private final double absoluteEncoderOffset;
 
@@ -32,7 +36,10 @@ public class SwerveModule {
         //initializing absolute encoder parameters 
         this.absoluteEncoderReversed = absoluteEncoderReversed;
         this.absoluteEncoderOffset = absoluteEncoderOffset;
-        absoluteEncoder = new AnalogInput(absoluteEncoderPort);
+        angleCANCoder = new CANCoder(absoluteEncoderPort);
+        angleCANCoder.setPositionToAbsolute();
+        angleCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+        angleCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
         
         //initializing SparkMax
         driveMotor = new CANSparkMax(drivePort, MotorType.kBrushless);
@@ -41,14 +48,14 @@ public class SwerveModule {
         rotationMotor.setInverted(rotationReversed);
 
         //initializing encoders
-        driveEncoder = driveMotor.getEncoder();
-        rotationEncoder = rotationMotor.getEncoder();   
+        driveEncoder = driveMotor.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor, 42);
+        rotationEncoder = rotationMotor.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor, 42);   
 
         //converting native units to measurements
-        driveEncoder.setPositionConversionFactor(SwerveModuleConstants.kRotationToMeters);
-        driveEncoder.setVelocityConversionFactor(SwerveModuleConstants.kMetersPerSecond);
-        rotationEncoder.setPositionConversionFactor(SwerveModuleConstants.kRotationToRadians);
-        rotationEncoder.setVelocityConversionFactor(SwerveModuleConstants.kRadiansPerSecond);
+        //driveEncoder.setPositionConversionFactor(SwerveModuleConstants.kRotationToMeters);
+        // driveEncoder.setVelocityConversionFactor(SwerveModuleConstants.kMetersPerSecond);
+        //rotationEncoder.setPositionConversionFactor(SwerveModuleConstants.kRotationToRadians);
+        // rotationEncoder.setVelocityConversionFactor(SwerveModuleConstants.kRadiansPerSecond);
 
         //initializing PID controller
         rotationPID = new PIDController(
@@ -102,9 +109,7 @@ public class SwerveModule {
      * @return The current reading of the absolute encoder in radians
      */
     public double getAbsoluteEncoderReading() {
-        double angle = (absoluteEncoder.getVoltage() / RobotController.getVoltage5V()) * (2 * Math.PI);
-        angle -= absoluteEncoderOffset;
-        return angle * (absoluteEncoderReversed ? -1 : 1);
+        return angleCANCoder.getAbsolutePosition()* (absoluteEncoderReversed ? 1 : 1);
     }
 
     /**

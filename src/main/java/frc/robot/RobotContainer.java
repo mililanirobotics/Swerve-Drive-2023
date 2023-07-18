@@ -18,7 +18,7 @@ import frc.robot.subsystems.SwerveDriveSubsystem;
 
 // Command Imports
 import frc.robot.commands.SwerveControlCommand;
-import frc.robot.commands.ZeroGyroCommand;
+// import frc.robot.commands.ZeroGyroCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -31,10 +31,6 @@ public class RobotContainer {
   private final SwerveDriveSubsystem swerveDriveSubsystem = new SwerveDriveSubsystem();
 
   private final GenericHID primaryGamepad = new GenericHID(JoystickConstants.kPrimaryGamepadPort);
-
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(SwerveModuleConstants.kDriverControllerPort);
 
   // Initializing Robot Subsystems
  
@@ -66,9 +62,9 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
-    new JoystickButton(primaryGamepad, JoystickConstants.kAButtonPort).onTrue(
-      new ZeroGyroCommand(swerveDriveSubsystem)
-    ); 
+    // new JoystickButton(primaryGamepad, JoystickConstants.kAButtonPort).onTrue(
+    //   new ZeroGyroCommand(swerveDriveSubsystem)
+    // ); 
     
   }
 
