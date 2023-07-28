@@ -108,7 +108,7 @@ public class SwerveModule {
      * Indicates which direction the motor should turn based on absoluteEncoderReversed 
      * @return The current reading of the absolute encoder in radians
      */
-    public double getAbsoluteEncoderReading() {
+    public double getCANCoderReading() {
         return angleCANCoder.getAbsolutePosition()* (absoluteEncoderReversed ? 1 : 1);
     }
 
@@ -117,7 +117,7 @@ public class SwerveModule {
      */
     public void resetEncoders() {
         driveEncoder.setPosition(0);
-        rotationEncoder.setPosition(getAbsoluteEncoderReading());
+        rotationEncoder.setPosition(getCANCoderReading());
     }
 
     /**

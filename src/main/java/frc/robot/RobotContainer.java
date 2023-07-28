@@ -18,7 +18,7 @@ import frc.robot.subsystems.SwerveDriveSubsystem;
 
 // Command Imports
 import frc.robot.commands.SwerveControlCommand;
-// import frc.robot.commands.ZeroGyroCommand;
+import frc.robot.commands.ZeroGyroCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -30,25 +30,21 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveDriveSubsystem swerveDriveSubsystem = new SwerveDriveSubsystem();
 
-  private final GenericHID primaryGamepad = new GenericHID(JoystickConstants.kPrimaryGamepadPort);
-
-  // Initializing Robot Subsystems
- 
+  private final GenericHID primaryGamepad = new GenericHID(JoystickConstants.kPrimaryGamepadPort); 
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    // Configure the trigger bindings
+    configureBindings();
+
     swerveDriveSubsystem.setDefaultCommand(new SwerveControlCommand(
-      primaryGamepad, 
       swerveDriveSubsystem, 
-      () -> -primaryGamepad.getRawAxis(JoystickConstants.kLeftYJoystickPort),
+      () -> primaryGamepad.getRawAxis(JoystickConstants.kLeftYJoystickPort),
       () -> primaryGamepad.getRawAxis(JoystickConstants.kleftXJoystickPort),
       () -> primaryGamepad.getRawAxis(JoystickConstants.kRightXJoystickPort)
       )
     );
-
-    // Configure the trigger bindings
-    configureBindings();
   }
 
   /**
@@ -62,9 +58,9 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
-    // new JoystickButton(primaryGamepad, JoystickConstants.kAButtonPort).onTrue(
-    //   new ZeroGyroCommand(swerveDriveSubsystem)
-    // ); 
+    new JoystickButton(primaryGamepad, JoystickConstants.kAButtonPort).onTrue(
+      new ZeroGyroCommand(swerveDriveSubsystem)
+    ); 
     
   }
 

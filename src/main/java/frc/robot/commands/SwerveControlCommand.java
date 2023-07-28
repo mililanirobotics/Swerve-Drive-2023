@@ -3,12 +3,10 @@ package frc.robot.commands;
 import java.util.function.Supplier;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 
 import frc.robot.subsystems.SwerveDriveSubsystem;
-import frc.robot.subsystems.SwerveModule;
 import frc.robot.Constants.JoystickConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.Constants.DriveConstants;
@@ -18,10 +16,10 @@ public class SwerveControlCommand extends CommandBase{
     private ChassisSpeeds chassisSpeeds;
 
     // Declaring the Subsystem
-    private SwerveDriveSubsystem swerveDriveSubsystem;
+    private SwerveDriveSubsystem m_SwerveDriveSubsystem;
 
     // SlewRateLimiter limits the rate of acceleration to be gradual and linear
-    //private SlewRateLimiter xLimiter, yLimiter, turningLimiter;
+    private SlewRateLimiter xLimiter, yLimiter, turningLimiter;
     
     private Supplier<Double> xSpeedInput, ySpeedInput, turningSpeedInput;
     private Supplier<Boolean> fieldOrientedFunction;
@@ -30,19 +28,20 @@ public class SwerveControlCommand extends CommandBase{
     private double ySpeed;
     private double turningSpeed;
 
-    // Instanced Gamepad Variable
-    private GenericHID primaryGamepad;
+    
+    public SwerveControlCommand(SwerveDriveSubsystem swerveDriveSubsystem, Supplier<Double> xSpeedInput, Supplier<Double> ySpeedInput, Supplier<Double> turningSpeedInput) {
 
-    public SwerveControlCommand(GenericHID primaryGamepad, SwerveDriveSubsystem swerveDriveSubsystem, Supplier<Double> xSpeedInput, Supplier<Double> ySpeedInput, Supplier<Double> turningSpeedInput) {
-
-        this.primaryGamepad = primaryGamepad;
-        this.swerveDriveSubsystem = swerveDriveSubsystem;
+        m_SwerveDriveSubsystem = swerveDriveSubsystem;
 
         this.xSpeedInput = xSpeedInput;
         this.ySpeedInput = ySpeedInput;
         this.turningSpeedInput = turningSpeedInput;
 
-        addRequirements(swerveDriveSubsystem);
+        this.xLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxMetersPerSecond);
+        this.yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxMetersPerSecond);
+        this.turningLimiter = new SlewRateLimiter(DriveConstants.kTeleRotationMaxRadiansPerSecond);
+
+        addRequirements(m_SwerveDriveSubsystem);
     }
 
     // Called when the command is initially scheduled.
@@ -61,16 +60,16 @@ public class SwerveControlCommand extends CommandBase{
         xSpeed = Math.abs(xSpeed) > JoystickConstants.kDeadband ? xSpeed : 0.0;
         ySpeed = Math.abs(ySpeed) > JoystickConstants.kDeadband ? ySpeed : 0.0; 
 
-        // Limiting Drive Speeds Acceleration to be linear
+        // // Limiting Drive Speeds Acceleration to be linear
 
         // xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxMetersPerSecond;
         // ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxMetersPerSecond;
         // turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kTeleRotationMaxRadiansPerSecond;
 
         // Creating desired chassis speeds from joystick inputs.
-        // chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        //     xSpeed, ySpeed, turningSpeed, swerveDriveSubsystem.getRotation2d()
-        // );
+        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+            xSpeed, ySpeed, turningSpeed, m_SwerveDriveSubsystem.getRotation2d()
+        );
 
         chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
 
@@ -78,16 +77,16 @@ public class SwerveControlCommand extends CommandBase{
         SwerveModuleState[] moduleStates = SwerveModuleConstants.kinematics.toSwerveModuleStates(chassisSpeeds);
         
         // Output each module state to the wheels
-        swerveDriveSubsystem.setModuleStates(moduleStates);
+        m_SwerveDriveSubsystem.setModuleStates(moduleStates);
 
         // Temporary CANCoder print
-        // System.out.println(leftFrontModule.getAbsoluteEncoderReading);
+        // System.out.println(leftFrontModule.getCANCoderReading);
     }
     
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        swerveDriveSubsystem.shutdown();
+        m_SwerveDriveSubsystem.shutdown();
     }
 
     // Returns true when the command should end.

@@ -21,23 +21,23 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
 
     // Drive Port Constants
-    public static final int kLeftFrontWheelPort = 20;
-    public static final int kLeftFrontRotationPort = 10;
-    public static final int kLeftFrontCANCoderPort = 10;
+    public static final int kLeftFrontWheelPort = 2;
+    public static final int kLeftFrontRotationPort = 3;
+    public static final int kLeftFrontCANCoderPort = 12;
 
-    public static final int kRightFrontWheelPort = 3;
-    public static final int kRightFrontRotationPort = 4;
-    public static final int kRightFrontCANCoderPort = 1;
+    public static final int kRightFrontWheelPort = 4;
+    public static final int kRightFrontRotationPort = 5;
+    public static final int kRightFrontCANCoderPort = 8;
 
-    public static final int kLeftBackWheelPort = 5;
-    public static final int kLeftBackRotationPort = 6;
-    public static final int kLeftBackCANCoderPort = 2;
+    public static final int kLeftBackWheelPort = 6;
+    public static final int kLeftBackRotationPort = 7;
+    public static final int kLeftBackCANCoderPort = 11;
 
-    public static final int kRightBackWheelPort = 7;
-    public static final int kRightBackRotationPort = 8;
-    public static final int kRightBackCANCoderPort = 3;
+    public static final int kRightBackWheelPort = 8;
+    public static final int kRightBackRotationPort = 9;
+    public static final int kRightBackCANCoderPort = 7;
 
-    public static final double kAbsoluteEncoderOffset = .20;
+    public static final double kCANCoderOffset = .20;
     
 
     // Reverse Booleans
