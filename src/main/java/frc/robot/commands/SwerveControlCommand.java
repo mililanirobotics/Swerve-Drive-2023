@@ -3,6 +3,7 @@ package frc.robot.commands;
 import java.util.function.Supplier;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 
@@ -28,8 +29,10 @@ public class SwerveControlCommand extends CommandBase{
     private double ySpeed;
     private double turningSpeed;
 
+    private GenericHID joystick;
+
     
-    public SwerveControlCommand(SwerveDriveSubsystem swerveDriveSubsystem, Supplier<Double> xSpeedInput, Supplier<Double> ySpeedInput, Supplier<Double> turningSpeedInput) {
+    public SwerveControlCommand(SwerveDriveSubsystem swerveDriveSubsystem, Supplier<Double> xSpeedInput, Supplier<Double> ySpeedInput, Supplier<Double> turningSpeedInput, GenericHID joystick) {
 
         m_SwerveDriveSubsystem = swerveDriveSubsystem;
 
@@ -40,6 +43,8 @@ public class SwerveControlCommand extends CommandBase{
         this.xLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxMetersPerSecond);
         this.yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxMetersPerSecond);
         this.turningLimiter = new SlewRateLimiter(DriveConstants.kTeleRotationMaxRadiansPerSecond);
+
+        this.joystick = joystick;
 
         addRequirements(m_SwerveDriveSubsystem);
     }
@@ -55,23 +60,23 @@ public class SwerveControlCommand extends CommandBase{
         xSpeed = xSpeedInput.get();
         ySpeed = ySpeedInput.get();
         turningSpeed = turningSpeedInput.get();
+        
+        System.out.println(xSpeed+", "+ySpeed);
 
         // Apply Deadband to prevent motors accidentally spinning
         xSpeed = Math.abs(xSpeed) > JoystickConstants.kDeadband ? xSpeed : 0.0;
         ySpeed = Math.abs(ySpeed) > JoystickConstants.kDeadband ? ySpeed : 0.0; 
 
-        // // Limiting Drive Speeds Acceleration to be linear
+        //Limiting Drive Speeds Acceleration to be linear
 
-        // xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxMetersPerSecond;
-        // ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxMetersPerSecond;
-        // turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kTeleRotationMaxRadiansPerSecond;
+        xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxMetersPerSecond;
+        ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxMetersPerSecond;
+        turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kTeleRotationMaxRadiansPerSecond;
 
         // Creating desired chassis speeds from joystick inputs.
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             xSpeed, ySpeed, turningSpeed, m_SwerveDriveSubsystem.getRotation2d()
         );
-
-        chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
 
         // Convert chassis speeds into swerve module states
         SwerveModuleState[] moduleStates = SwerveModuleConstants.kinematics.toSwerveModuleStates(chassisSpeeds);
@@ -80,7 +85,7 @@ public class SwerveControlCommand extends CommandBase{
         m_SwerveDriveSubsystem.setModuleStates(moduleStates);
 
         // Temporary CANCoder print
-        // System.out.println(leftFrontModule.getCANCoderReading);
+        m_SwerveDriveSubsystem.getCANCoderReading();
     }
     
     // Called once the command ends or is interrupted.

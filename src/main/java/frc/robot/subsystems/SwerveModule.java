@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.AnalogInput; 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxRelativeEncoder;
@@ -13,7 +12,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 
 public class SwerveModule {
@@ -151,12 +150,14 @@ public class SwerveModule {
      * @param currentState The swerve module state of the motor
      */
     public void setSwerveState(SwerveModuleState currentState) {
-        if(Math.abs(currentState.speedMetersPerSecond) < 0.01) {
+        if(Math.abs(currentState.speedMetersPerSecond) < 0.001) {
             shutdown();
             return;
         }
 
         currentState = SwerveModuleState.optimize(currentState, getModuleState().angle);
+        driveMotor.set(currentState.speedMetersPerSecond / DriveConstants.kDriveMaxMetersPerSecond);
+        rotationMotor.set(rotationPID.calculate(getRotationPosition(), currentState.angle.getRadians()));
     }
 }
 

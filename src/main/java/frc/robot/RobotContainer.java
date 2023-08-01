@@ -42,7 +42,8 @@ public class RobotContainer {
       swerveDriveSubsystem, 
       () -> primaryGamepad.getRawAxis(JoystickConstants.kLeftYJoystickPort),
       () -> primaryGamepad.getRawAxis(JoystickConstants.kleftXJoystickPort),
-      () -> primaryGamepad.getRawAxis(JoystickConstants.kRightXJoystickPort)
+      () -> primaryGamepad.getRawAxis(JoystickConstants.kRightXJoystickPort),
+      primaryGamepad
       )
     );
   }

@@ -3,12 +3,6 @@ package frc.robot.subsystems;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 
-import com.revrobotics.AnalogInput;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -39,8 +33,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
         // Front Right Module Initializing
         rightFrontModule = new SwerveModule(
-            SwerveModuleConstants.kRightBackWheelPort, 
-            SwerveModuleConstants.kRightBackRotationPort, 
+            SwerveModuleConstants.kRightFrontWheelPort, 
+            SwerveModuleConstants.kRightFrontRotationPort, 
             SwerveModuleConstants.kRightFrontReversed, 
             SwerveModuleConstants.kRightFrontReversed, 
             SwerveModuleConstants.kRightFrontCANCoderPort, 
@@ -130,5 +124,12 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         rightFrontModule.setSwerveState(desiredStates[1]);
         leftBackModule.setSwerveState(desiredStates[2]);
         rightBackModule.setSwerveState(desiredStates[3]);
+    }
+
+    public void getCANCoderReading() {
+        System.out.println("Left Front: "+leftFrontModule.getCANCoderReading());
+        System.out.println("Left Back: "+leftBackModule.getCANCoderReading());
+        System.out.println("Right Front: "+rightFrontModule.getCANCoderReading());
+        System.out.println("Right Back: "+rightBackModule.getCANCoderReading());
     }
 }

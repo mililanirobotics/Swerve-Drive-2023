@@ -21,23 +21,23 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
 
     // Drive Port Constants
-    public static final int kLeftFrontWheelPort = 2;
-    public static final int kLeftFrontRotationPort = 3;
+    public static final int kLeftFrontWheelPort = 13;
+    public static final int kLeftFrontRotationPort = 14;
     public static final int kLeftFrontCANCoderPort = 12;
 
-    public static final int kRightFrontWheelPort = 4;
-    public static final int kRightFrontRotationPort = 5;
-    public static final int kRightFrontCANCoderPort = 8;
+    public static final int kRightFrontWheelPort = 5;
+    public static final int kRightFrontRotationPort = 6;
+    public static final int kRightFrontCANCoderPort = 1;
 
-    public static final int kLeftBackWheelPort = 6;
-    public static final int kLeftBackRotationPort = 7;
+    public static final int kLeftBackWheelPort = 15;
+    public static final int kLeftBackRotationPort = 16;
     public static final int kLeftBackCANCoderPort = 11;
 
-    public static final int kRightBackWheelPort = 8;
-    public static final int kRightBackRotationPort = 9;
-    public static final int kRightBackCANCoderPort = 7;
+    public static final int kRightBackWheelPort = 3;
+    public static final int kRightBackRotationPort = 4;
+    public static final int kRightBackCANCoderPort = 20;
 
-    public static final double kCANCoderOffset = .20;
+    public static final double kCANCoderOffset = 0;
     
 
     // Reverse Booleans
@@ -55,8 +55,7 @@ public final class Constants {
     public static final double kRadiansPerSecond = 0;
 
     // PID Constants
-
-    public static final double kTurningP = 0;
+    public static final double kTurningP = 0.3;
     public static final double kTurningI = 0;
     public static final double kTurningD = 0;
 
@@ -98,7 +97,10 @@ public final class Constants {
     );
 
     public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
-      leftFrontLocation, rightFrontLocation, leftBackLocation, rightBackLocation
+      leftFrontLocation, 
+      rightFrontLocation,
+      leftBackLocation,
+      rightBackLocation
     );
   }
 
@@ -127,7 +129,7 @@ public final class Constants {
     public final static int kBButtonPort = 2;
     
     // Deadband constant to correct minor joystick inputs
-    public static final double kDeadband = 0.05;
+    public static final double kDeadband = 0.07;
   }
 
 }
