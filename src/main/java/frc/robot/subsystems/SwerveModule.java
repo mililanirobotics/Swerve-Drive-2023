@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.lang.Math;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxRelativeEncoder;
@@ -12,6 +13,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 
@@ -26,18 +28,18 @@ public class SwerveModule {
     private final PIDController rotationPID;
     //angle offsets
     private final CANCoder angleCANCoder;
-    private final boolean absoluteEncoderReversed;
-    private final double absoluteEncoderOffset;
+    private final boolean CANCoderReversed;
+    private final double CANCoderOffset;
 
     //constructor
     public SwerveModule(int drivePort, int rotationPort, boolean driveReversed, boolean rotationReversed,
-            int absoluteEncoderPort, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
+            int CANCoderPort, double CANCoderOffset, boolean CANCoderReversed) {
         //initializing absolute encoder parameters 
-        this.absoluteEncoderReversed = absoluteEncoderReversed;
-        this.absoluteEncoderOffset = absoluteEncoderOffset;
-        angleCANCoder = new CANCoder(absoluteEncoderPort);
+        this.CANCoderReversed = CANCoderReversed;
+        this.CANCoderOffset = CANCoderOffset;
+        angleCANCoder = new CANCoder(CANCoderPort);
         angleCANCoder.setPositionToAbsolute();
-        angleCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+        angleCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
         angleCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
         
         //initializing SparkMax
@@ -51,10 +53,10 @@ public class SwerveModule {
         rotationEncoder = rotationMotor.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor, 42);   
 
         //converting native units to measurements
-        //driveEncoder.setPositionConversionFactor(SwerveModuleConstants.kRotationToMeters);
-        // driveEncoder.setVelocityConversionFactor(SwerveModuleConstants.kMetersPerSecond);
-        //rotationEncoder.setPositionConversionFactor(SwerveModuleConstants.kRotationToRadians);
-        // rotationEncoder.setVelocityConversionFactor(SwerveModuleConstants.kRadiansPerSecond);
+        driveEncoder.setPositionConversionFactor(SwerveModuleConstants.kRotationToMeters);
+        driveEncoder.setVelocityConversionFactor(SwerveModuleConstants.kMetersPerSecond);
+        rotationEncoder.setPositionConversionFactor(SwerveModuleConstants.kRotationToRadians);
+        rotationEncoder.setVelocityConversionFactor(SwerveModuleConstants.kRadiansPerSecond);
 
         //initializing PID controller
         rotationPID = new PIDController(
@@ -64,6 +66,8 @@ public class SwerveModule {
         );
         //calculates the least turning degrees to setpoint
         rotationPID.enableContinuousInput(-Math.PI, Math.PI);
+
+        resetEncoders();
     }
 
     //=========================================================================== 
@@ -108,7 +112,8 @@ public class SwerveModule {
      * @return The current reading of the absolute encoder in radians
      */
     public double getCANCoderReading() {
-        return angleCANCoder.getAbsolutePosition()* (absoluteEncoderReversed ? 1 : 1);
+        double angle = angleCANCoder.getAbsolutePosition() / 360.0;
+        return (angle * 2.0 * Math.PI - CANCoderOffset) * (CANCoderReversed ? -1 : 1);
     }
 
     /**

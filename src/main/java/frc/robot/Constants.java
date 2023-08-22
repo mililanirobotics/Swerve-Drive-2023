@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -20,10 +21,14 @@ public final class Constants {
 
     public static final int kDriverControllerPort = 0;
 
+    public static final double kRotationGearRatio = 1 / (150 / 7.0);
+    public static final double kDriveGearRatio = 1/ 8.14;
+    public static final double kWheelDiameter = Units.inchesToMeters(4);
+
     // Drive Port Constants
     public static final int kLeftFrontWheelPort = 13;
     public static final int kLeftFrontRotationPort = 14;
-    public static final int kLeftFrontCANCoderPort = 12;
+    public static final int kLeftFrontCANCoderPort = 3;
 
     public static final int kRightFrontWheelPort = 5;
     public static final int kRightFrontRotationPort = 6;
@@ -31,31 +36,44 @@ public final class Constants {
 
     public static final int kLeftBackWheelPort = 15;
     public static final int kLeftBackRotationPort = 16;
-    public static final int kLeftBackCANCoderPort = 11;
+    public static final int kLeftBackCANCoderPort = 2;
 
     public static final int kRightBackWheelPort = 3;
     public static final int kRightBackRotationPort = 4;
-    public static final int kRightBackCANCoderPort = 20;
+    public static final int kRightBackCANCoderPort = 4;
 
-    public static final double kCANCoderOffset = 0;
+    public static final double kLeftFrontCANCoderOffset = 4.9;
+    public static final double kRightFrontCANCoderOffset = 3.3;
+    public static final double kLeftBackCANCoderOffset = 4.25;
+    public static final double kRightBackCANCoderOffset = 1.59;
     
 
     // Reverse Booleans
-    public static final boolean kLeftFrontReversed = false;
-    public static final boolean kRightFrontReversed = true;
-    public static final boolean kLeftBackReversed = false;
-    public static final boolean kRightBackReversed = true;
+    public static final boolean kLeftFrontDriveReversed = false;
+    public static final boolean kRightFrontDriveReversed = true;
+    public static final boolean kLeftBackDriveReversed = false;
+    public static final boolean kRightBackDriveReversed = true;
+
+    public static final boolean kLeftFrontRotationReversed = true;
+    public static final boolean kRightFrontRotationReversed = true;
+    public static final boolean kLeftBackRotationReversed = true;
+    public static final boolean kRightBackRotationReversed = true;
+
+    public static final boolean kLeftFrontCANCoderReversed = false;
+    public static final boolean kRightFrontCANCoderReversed = false;
+    public static final boolean kLeftBackCANCoderReversed = false;
+    public static final boolean kRightBackCANCoderReversed = false;
 
     // Conversion Units
-    public static final double kRotationToMeters = 0;
-    public static final double kRotationToRadians = 0;
+    public static final double kRotationToMeters = kDriveGearRatio * Math.PI * kWheelDiameter;
+    public static final double kRotationToRadians = kRotationGearRatio * 2 * Math.PI;
 
     // Measurement Units
-    public static final double kMetersPerSecond = 0;
-    public static final double kRadiansPerSecond = 0;
+    public static final double kMetersPerSecond = kRotationToMeters / 60.0 ;
+    public static final double kRadiansPerSecond = kRotationToRadians / 60.0;
 
     // PID Constants
-    public static final double kTurningP = 0.3;
+    public static final double kTurningP = 0.6;
     public static final double kTurningI = 0;
     public static final double kTurningD = 0;
 
@@ -63,7 +81,6 @@ public final class Constants {
     public static final double kModuleDistance = 0.312;
 
     // 2d translation coordinates relative to center 
-
     public static final double kLeftFront2dX = kModuleDistance;
     public static final double kLeftFront2dY = kModuleDistance;
 
@@ -107,11 +124,11 @@ public final class Constants {
   public static class DriveConstants {
 
     // Drive Speed Constants
-    public static final double kDriveMaxMetersPerSecond = 1;
-    public static final double kRotationMaxRadiansPerSecond = 1.5;
+    public static final double kDriveMaxMetersPerSecond = 5;
+    public static final double kRotationMaxRadiansPerSecond = 3;
 
-    public static final double kTeleDriveMaxMetersPerSecond = kDriveMaxMetersPerSecond / 4;
-    public static final double kTeleRotationMaxRadiansPerSecond = kRotationMaxRadiansPerSecond / 4;
+    public static final double kTeleDriveMaxAcceleration = kDriveMaxMetersPerSecond;
+    public static final double kTeleRotationMaxAngularAcceleration = kRotationMaxRadiansPerSecond;
 
   }
 
@@ -121,8 +138,8 @@ public final class Constants {
     // Gamepad Axis Ports
     public static final int kleftXJoystickPort = 0;
     public static final int kLeftYJoystickPort = 1;
-    public static final int kRightXJoystickPort = 2;
-    public static final int kRightYJoystickPort = 3; 
+    public static final int kRightXJoystickPort = 4;
+    public static final int kRightYJoystickPort = 5; 
 
     // Gamepad Button Ports
     public final static int kAButtonPort = 1;

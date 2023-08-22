@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -24,45 +24,57 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         leftFrontModule = new SwerveModule(
             SwerveModuleConstants.kLeftFrontWheelPort, 
             SwerveModuleConstants.kLeftFrontRotationPort, 
-            SwerveModuleConstants.kLeftFrontReversed, 
-            SwerveModuleConstants.kLeftFrontReversed, 
+            SwerveModuleConstants.kLeftFrontDriveReversed, 
+            SwerveModuleConstants.kLeftFrontRotationReversed, 
             SwerveModuleConstants.kLeftFrontCANCoderPort, 
-            SwerveModuleConstants.kCANCoderOffset, 
-            SwerveModuleConstants.kLeftFrontReversed
+            SwerveModuleConstants.kLeftFrontCANCoderOffset, 
+            SwerveModuleConstants.kLeftFrontCANCoderReversed
         );
 
         // Front Right Module Initializing
         rightFrontModule = new SwerveModule(
             SwerveModuleConstants.kRightFrontWheelPort, 
             SwerveModuleConstants.kRightFrontRotationPort, 
-            SwerveModuleConstants.kRightFrontReversed, 
-            SwerveModuleConstants.kRightFrontReversed, 
+            SwerveModuleConstants.kRightFrontDriveReversed, 
+            SwerveModuleConstants.kRightFrontRotationReversed, 
             SwerveModuleConstants.kRightFrontCANCoderPort, 
-            SwerveModuleConstants.kCANCoderOffset, 
-            SwerveModuleConstants.kRightFrontReversed
+            SwerveModuleConstants.kRightFrontCANCoderOffset, 
+            SwerveModuleConstants.kRightFrontCANCoderReversed
         );
 
         leftBackModule = new SwerveModule(
             SwerveModuleConstants.kLeftBackWheelPort, 
             SwerveModuleConstants.kLeftBackRotationPort, 
-            SwerveModuleConstants.kLeftBackReversed, 
-            SwerveModuleConstants.kLeftBackReversed, 
+            SwerveModuleConstants.kLeftBackDriveReversed, 
+            SwerveModuleConstants.kLeftBackRotationReversed, 
             SwerveModuleConstants.kLeftBackCANCoderPort, 
-            SwerveModuleConstants.kCANCoderOffset, 
-            SwerveModuleConstants.kLeftBackReversed
+            SwerveModuleConstants.kLeftBackCANCoderOffset, 
+            SwerveModuleConstants.kLeftBackCANCoderReversed
         );
 
         rightBackModule = new SwerveModule(
             SwerveModuleConstants.kRightBackWheelPort, 
             SwerveModuleConstants.kRightBackRotationPort, 
-            SwerveModuleConstants.kRightBackReversed, 
-            SwerveModuleConstants.kRightBackReversed, 
+            SwerveModuleConstants.kRightBackDriveReversed, 
+            SwerveModuleConstants.kRightBackRotationReversed, 
             SwerveModuleConstants.kRightBackCANCoderPort, 
-            SwerveModuleConstants.kCANCoderOffset, 
-            SwerveModuleConstants.kRightBackReversed
+            SwerveModuleConstants.kRightBackCANCoderOffset, 
+            SwerveModuleConstants.kRightBackCANCoderReversed
         );
 
         navX = new AHRS(SPI.Port.kMXP);
+        navX.enableLogging(true);
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                navX.calibrate();
+                navX.reset();
+            } 
+            catch(Exception e) {
+
+            }
+        }).start();
     }
 
     //=========================================================================== 
@@ -108,7 +120,13 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      * Gets the rotation of the robot from a top down perspective
      */
     public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getYaw());
+        return Rotation2d.fromDegrees(getDegrees());
+    }
+
+    public double getDegrees() {
+        double rawDegrees = -getYaw() % 360;
+        SmartDashboard.putNumber("yessir", rawDegrees);
+        return rawDegrees < 0 ? rawDegrees + 360 : rawDegrees;
     }
 
     public void shutdown() {
@@ -117,6 +135,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         leftBackModule.shutdown();
         rightBackModule.shutdown();
     }
+
+    
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kDriveMaxMetersPerSecond);
