@@ -69,7 +69,7 @@ public class SwerveControlCommand extends CommandBase{
 
         // Creating desired chassis speeds from joystick inputs.
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed, ySpeed, turningSpeed, m_SwerveDriveSubsystem.getRotation2d()
+            xSpeed, ySpeed, turningSpeed, m_SwerveDriveSubsystem.getRotation2dContinuous()
         );
 
         // Convert chassis speeds into swerve module states

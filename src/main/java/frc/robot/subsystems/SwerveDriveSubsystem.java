@@ -3,8 +3,11 @@ package frc.robot.subsystems;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
@@ -18,6 +21,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     private SwerveModule rightBackModule;
 
     private AHRS navX;
+
+    private SwerveDriveOdometry odometry;
 
     public SwerveDriveSubsystem() {
         // Front Left Module Initializing
@@ -75,6 +80,12 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
             }
         }).start();
+
+        odometry = new SwerveDriveOdometry(
+            SwerveModuleConstants.kinematics, 
+            getRotation2dContinuous(),
+            getModulePosition()
+        );
     }
 
     //=========================================================================== 
@@ -119,8 +130,12 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     /**
      * Gets the rotation of the robot from a top down perspective
      */
-    public Rotation2d getRotation2d() {
+    public Rotation2d getRotation2dContinuous() {
         return Rotation2d.fromDegrees(getDegrees());
+    }
+
+    public Rotation2d getRotation2d() {
+        return Rotation2d.fromDegrees(getYaw());
     }
 
     public double getDegrees() {
@@ -136,8 +151,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         rightBackModule.shutdown();
     }
 
-    
-
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kDriveMaxMetersPerSecond);
         leftFrontModule.setSwerveState(desiredStates[0]);
@@ -151,5 +164,45 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         System.out.println("Left Back: "+leftBackModule.getCANCoderReading());
         System.out.println("Right Front: "+rightFrontModule.getCANCoderReading());
         System.out.println("Right Back: "+rightBackModule.getCANCoderReading());
+    }
+
+    /**
+     * Returns the current position of the module (displacement)
+    * @return The current displacement of the module
+    */
+    public SwerveModulePosition[] getModulePosition() {
+        return new SwerveModulePosition[] {
+            new SwerveModulePosition(
+                leftFrontModule.getDrivePosition(), new Rotation2d(leftFrontModule.getRotationPosition())
+            ),
+            new SwerveModulePosition(
+                rightFrontModule.getDrivePosition(), new Rotation2d(rightFrontModule.getRotationPosition())
+            ),
+            new SwerveModulePosition(
+                leftBackModule.getDrivePosition(), new Rotation2d(leftBackModule.getRotationPosition())
+            ),
+            new SwerveModulePosition(
+                rightBackModule.getDrivePosition(), new Rotation2d(rightBackModule.getRotationPosition())
+            )
+        };
+    }
+
+    public Pose2d getPose() {
+        return odometry.getPoseMeters();
+    }
+
+    public void resetOdometry(Pose2d pose) {
+        odometry.resetPosition(getRotation2dContinuous(), getModulePosition(), pose);
+    }
+
+    @Override
+    public void periodic() {
+        odometry.update(
+            getRotation2dContinuous(),
+            getModulePosition()
+        );
+
+        SmartDashboard.putNumber("Robot Heading", getYaw());
+        SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
     }
 }

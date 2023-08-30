@@ -134,14 +134,6 @@ public class SwerveModule {
     }
 
     /**
-     * Returns the current position of the module (displacement)
-    * @return The current displacement of the module
-    */
-    public SwerveModulePosition getModulePosition() {
-        return new SwerveModulePosition(driveEncoder.getPosition(), new Rotation2d(rotationEncoder.getPosition()));
-    }
-
-    /**
      * Stops the movement of the drive and rotation motor 
      */
     public void shutdown() {

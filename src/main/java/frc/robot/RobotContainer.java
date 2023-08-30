@@ -5,10 +5,30 @@
 package frc.robot;
 
 import frc.robot.Constants.SwerveModuleConstants;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.JoystickConstants;
+
+import java.util.List;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -32,6 +52,7 @@ public class RobotContainer {
 
   private final GenericHID primaryGamepad = new GenericHID(JoystickConstants.kPrimaryGamepadPort); 
 
+  private SendableChooser<CommandBase> autoCommand = new SendableChooser<CommandBase>();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -39,13 +60,19 @@ public class RobotContainer {
     configureBindings();
 
     swerveDriveSubsystem.setDefaultCommand(new SwerveControlCommand(
-      swerveDriveSubsystem, 
-      () -> primaryGamepad.getRawAxis(JoystickConstants.kLeftYJoystickPort),
-      () -> primaryGamepad.getRawAxis(JoystickConstants.kleftXJoystickPort),
-      () -> primaryGamepad.getRawAxis(JoystickConstants.kRightXJoystickPort),
-      primaryGamepad
+        swerveDriveSubsystem, 
+        () -> primaryGamepad.getRawAxis(JoystickConstants.kLeftYJoystickPort),
+        () -> primaryGamepad.getRawAxis(JoystickConstants.kleftXJoystickPort),
+        () -> primaryGamepad.getRawAxis(JoystickConstants.kRightXJoystickPort),
+        primaryGamepad
       )
     );
+
+    autoCommand.addOption("Test trajectory", runTrajectory(AutoConstants.testDrive));
+
+      autoCommand.addOption("Test Figure Eight", runTrajectory(AutoConstants.figureEightPath));
+
+    SmartDashboard.putData("auto", autoCommand);
   }
 
   /**
@@ -58,11 +85,50 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-
     new JoystickButton(primaryGamepad, JoystickConstants.kAButtonPort).onTrue(
       new ZeroGyroCommand(swerveDriveSubsystem)
     ); 
-    
+  }
+
+  public CommandBase runTrajectory(Trajectory generatedTrajectory) {
+    PIDController xController = new PIDController(
+      AutoConstants.kPXController, 
+      AutoConstants.kIXController,
+      AutoConstants.kDXController
+    );
+
+    PIDController yController = new PIDController(
+      AutoConstants.kPYController,
+      AutoConstants.kIYController,
+      AutoConstants.kDYController
+    );
+
+    ProfiledPIDController thetaController = new ProfiledPIDController(
+      AutoConstants.kPThetaController,
+      AutoConstants.kIThetaController,
+      AutoConstants.kDThetaController,
+      AutoConstants.kThetaControllerConstraints
+    );
+
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    SwerveControllerCommand swerveTrajectory = new SwerveControllerCommand(
+      generatedTrajectory,
+      swerveDriveSubsystem::getPose,
+      SwerveModuleConstants.kinematics,
+      xController,
+      yController,
+      thetaController,
+      swerveDriveSubsystem::setModuleStates,
+      swerveDriveSubsystem
+    );
+
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> swerveDriveSubsystem.resetOdometry(generatedTrajectory.getInitialPose())),
+      new WaitCommand(1),
+      swerveTrajectory,
+      new InstantCommand(() -> swerveDriveSubsystem.shutdown())
+    );
   }
 
   /**
@@ -72,6 +138,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return null;
+    return autoCommand.getSelected();
   }
 }

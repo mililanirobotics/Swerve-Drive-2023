@@ -4,8 +4,16 @@
 
 package frc.robot;
 
+import java.util.List;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -124,12 +132,82 @@ public final class Constants {
   public static class DriveConstants {
 
     // Drive Speed Constants
-    public static final double kDriveMaxMetersPerSecond = 5;
+    public static final double kDriveMaxMetersPerSecond = 3;
     public static final double kRotationMaxRadiansPerSecond = 3;
 
     public static final double kTeleDriveMaxAcceleration = kDriveMaxMetersPerSecond;
     public static final double kTeleRotationMaxAngularAcceleration = kRotationMaxRadiansPerSecond;
+  }
 
+  public static class AutoConstants {
+    public static final double kAutoDriveMaxMetersPerSecond = 4;
+    public static final double kAutoDriveMaxAcceleration = kAutoDriveMaxMetersPerSecond;
+    public static final double kAutoDriveMaxRadiansPerSecond = 1.5;
+    public static final double kAutoDriveMaxAngularAcceleration = kAutoDriveMaxRadiansPerSecond;
+
+    //PID Constants
+    public static final double kPXController = 0.5;
+    public static final double kIXController = 0;
+    public static final double kDXController = 0.006;
+
+    public static final double kPYController = 0.5;
+    public static final double kIYController = 0;
+    public static final double kDYController = 0.006;
+
+    public static final double kPThetaController = 0.45;
+    public static final double kIThetaController = 0;
+    public static final double kDThetaController = -0.15;
+
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = 
+      new TrapezoidProfile.Constraints(
+        kAutoDriveMaxRadiansPerSecond, 
+        kAutoDriveMaxAngularAcceleration
+      );
+
+    //================================
+    // Trajectory
+    //================================
+    
+    private static final TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
+      kAutoDriveMaxMetersPerSecond,
+      kAutoDriveMaxAcceleration
+    )
+    .setKinematics(SwerveModuleConstants.kinematics);
+
+    public static final Trajectory testDrive = 
+      TrajectoryGenerator.generateTrajectory(
+        new Pose2d(0, 0, new Rotation2d(0)),
+        List.of(
+          new Translation2d(0, 1),
+          new Translation2d(0.5, 1),
+          new Translation2d(0.5, 0)
+        ),
+        new Pose2d(0, 0, new Rotation2d(0)),
+        trajectoryConfig
+      );
+    
+    public static final Trajectory figureEightPath = 
+      TrajectoryGenerator.generateTrajectory(
+      new Pose2d(0, 0, new Rotation2d(0)),
+      List.of(
+        //first point (-0.25, 0.5)
+        new Translation2d(-0.25, 0.5),
+        //second point (-0.5, 0)
+        new Translation2d(-0.5, 0),
+        //third point (-0.25, -0.5)
+        new Translation2d(-0.25, -0.5),
+        //fourth point (0, 0)
+        new Translation2d(0, 0),
+        //fifth point (0.25, 0.5)
+        new Translation2d(0.25, 0.5),
+        //sixth point (0.5, 0)
+        new Translation2d(0.5, 0),
+        //seventh point (0.25, -0.5)
+        new Translation2d(0.25, -0.5)
+      ),
+      new Pose2d(0, 0, Rotation2d.fromRadians(Math.PI)),
+      trajectoryConfig      
+    );
   }
 
   public static class JoystickConstants {
