@@ -129,10 +129,13 @@ public class SwerveModule {
      * Optimizes the module's path to a given setpoint
      * @return Swerve module state object with the module's current position and 
      */
-    public SwerveModuleState getModuleState() {
-        return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getRotationPosition()));
-    }
+    // public SwerveModuleState getModuleState() {
+    //     return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getRotationPosition()));
+    // }
 
+    public SwerveModuleState getModuleState() {
+        return new SwerveModuleState(getDriveVelocity(), Rotation2d.fromRadians(getRotationPosition()));
+    }
     /**
      * Stops the movement of the drive and rotation motor 
      */

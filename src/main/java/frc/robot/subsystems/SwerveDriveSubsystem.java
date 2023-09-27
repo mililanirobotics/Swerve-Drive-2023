@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.SwerveModuleConstants;
@@ -131,16 +132,33 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      * Gets the rotation of the robot from a top down perspective
      */
     public Rotation2d getRotation2dContinuous() {
+        System.out.println(getDegrees());
         return Rotation2d.fromDegrees(getDegrees());
     }
 
-    public Rotation2d getRotation2d() {
+    /**
+     * Gets the rotation of the robot from a top down perspective
+     */
+    public Rotation2d getRotation2dCWP() {
+        return Rotation2d.fromDegrees(getDegreesCWP());
+    }
+
+    public Rotation2d getRotation2dRad() {
         return Rotation2d.fromDegrees(getYaw());
     }
 
     public double getDegrees() {
-        double rawDegrees = -getYaw() % 360;
-        SmartDashboard.putNumber("yessir", rawDegrees);
+        double rawDegrees = -getYaw();
+        return rawDegrees < 0 ? rawDegrees + 360 : rawDegrees;
+    }
+
+    public double getRad() {
+        double rad = Units.degreesToRadians(-getYaw()) % (2 * Math.PI);
+        return rad < 0 ? rad + 2 * Math.PI : rad;
+    }
+
+    public double getDegreesCWP() {
+        double rawDegrees = getYaw() % 360;
         return rawDegrees < 0 ? rawDegrees + 360 : rawDegrees;
     }
 
@@ -202,7 +220,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             getModulePosition()
         );
 
-        SmartDashboard.putNumber("Robot Heading", getYaw());
+        SmartDashboard.putNumber("Robot Heading", getDegrees());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
     }
 }

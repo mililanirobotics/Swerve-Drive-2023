@@ -45,10 +45,6 @@ public class SwerveControlCommand extends CommandBase{
         addRequirements(m_SwerveDriveSubsystem);
     }
 
-    // Called when the command is initially scheduled.
-    @Override
-    public void initialize() {}
-
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
@@ -82,6 +78,7 @@ public class SwerveControlCommand extends CommandBase{
         m_SwerveDriveSubsystem.getCANCoderReading();
         SmartDashboard.putNumber("Naxv Yaw", m_SwerveDriveSubsystem.getYaw());
         SmartDashboard.putNumber("Naxv Degrees", m_SwerveDriveSubsystem.getDegrees());
+        SmartDashboard.putNumber("Radians", m_SwerveDriveSubsystem.getRad());
 
         System.out.println("NavX Yaw: "+m_SwerveDriveSubsystem.getYaw());
         System.out.println("NavX Pitch: "+m_SwerveDriveSubsystem.getPitch());

@@ -33,6 +33,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+
 // Subsystem Imports
 import frc.robot.subsystems.SwerveDriveSubsystem;
 
@@ -49,6 +55,12 @@ import frc.robot.commands.ZeroGyroCommand;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveDriveSubsystem swerveDriveSubsystem = new SwerveDriveSubsystem();
+
+  private final TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
+    AutoConstants.kAutoDriveMaxMetersPerSecond,
+    AutoConstants.kAutoDriveMaxAcceleration
+  )
+  .setKinematics(SwerveModuleConstants.kinematics);
 
   private final GenericHID primaryGamepad = new GenericHID(JoystickConstants.kPrimaryGamepadPort); 
 
@@ -68,9 +80,41 @@ public class RobotContainer {
       )
     );
 
-    autoCommand.addOption("Test trajectory", runTrajectory(AutoConstants.testDrive));
+    // autoCommand.addOption("Test Figure Eight", runTrajectory(
+    //     TrajectoryGenerator.generateTrajectory(
+    //       new Pose2d(0, 0, swerveDriveSubsystem.getRotation2dContinuous()),
+    //       AutoConstants.figureEightPath, 
+    //       new Pose2d(0, 0, Rotation2d.fromDegrees(180)), 
+    //       trajectoryConfig
+    //     )
+    //   )
+    // );
 
-      autoCommand.addOption("Test Figure Eight", runTrajectory(AutoConstants.figureEightPath));
+    autoCommand.addOption("Test Straight Line", runTrajectory(
+      PathPlanner.generatePath(
+        new PathConstraints(AutoConstants.kAutoDriveMaxMetersPerSecond,
+          AutoConstants.kAutoDriveMaxAcceleration), 
+          new PathPoint(new Translation2d(0, 0), Rotation2d.fromDegrees(0)), 
+          new PathPoint(new Translation2d(1, 0), Rotation2d.fromDegrees(180)),
+          new PathPoint(new Translation2d(0, 0), Rotation2d.fromDegrees(0))
+        )
+      )
+    );  
+
+    PathPlannerTrajectory straightTrajectory = PathPlanner.generatePath(
+        new PathConstraints(AutoConstants.kAutoDriveMaxMetersPerSecond,
+        AutoConstants.kAutoDriveMaxAcceleration), 
+        new PathPoint(new Translation2d(0, 0), Rotation2d.fromDegrees(0)), 
+        new PathPoint(new Translation2d(0.5, 0), Rotation2d.fromDegrees(90)),
+        new PathPoint(new Translation2d(0, 0), Rotation2d.fromDegrees(0))
+      );
+
+    PathPlannerTrajectory john = PathPlanner.loadPath("God's Plan", new PathConstraints(
+        AutoConstants.kAutoDriveMaxMetersPerSecond, AutoConstants.kAutoDriveMaxAcceleration
+      )
+    );
+
+    autoCommand.addOption("John", runTrajectory(john));
 
     SmartDashboard.putData("auto", autoCommand);
   }
@@ -90,7 +134,7 @@ public class RobotContainer {
     ); 
   }
 
-  public CommandBase runTrajectory(Trajectory generatedTrajectory) {
+  public CommandBase runTrajectory(PathPlannerTrajectory generatedTrajectory) {
     PIDController xController = new PIDController(
       AutoConstants.kPXController, 
       AutoConstants.kIXController,
@@ -103,16 +147,15 @@ public class RobotContainer {
       AutoConstants.kDYController
     );
 
-    ProfiledPIDController thetaController = new ProfiledPIDController(
+    PIDController thetaController = new PIDController(
       AutoConstants.kPThetaController,
       AutoConstants.kIThetaController,
-      AutoConstants.kDThetaController,
-      AutoConstants.kThetaControllerConstraints
+      AutoConstants.kDThetaController
     );
-
+    
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    SwerveControllerCommand swerveTrajectory = new SwerveControllerCommand(
+    PPSwerveControllerCommand swerveTrajectory = new PPSwerveControllerCommand(
       generatedTrajectory,
       swerveDriveSubsystem::getPose,
       SwerveModuleConstants.kinematics,
